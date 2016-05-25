@@ -1,0 +1,29 @@
+{
+	"name" : "mysql-workbench-schema-exporter/laravel5-exporter",
+	"type" : "library",
+	"description" : "MySQL Workbench Schema Exporter for Laravel 5.0",
+	"keywords" : [
+		"mysql",
+		"mysql workbench",
+		"database",
+		"cli",
+		"laravel"
+	],
+	"homepage" : "https://github.com/vitalibr/laravel5-exporter",
+	"license" : "MIT",
+	"authors" : [{
+			"name" : "Mateus Vitali",
+			"email" : "mateus.c.vitali@gmail.com",
+			"role" : "Developer"
+		}
+	],
+	"require" : {
+		"php" : ">=5.4.0",
+		"mysql-workbench-schema-exporter/mysql-workbench-schema-exporter": "^3.0.0"
+	},
+	"autoload" : {
+		"psr-4" : {
+			"MwbExporter\\Formatter\\Laravel5\\" : "lib/MwbExporter/Formatter/Laravel5/"
+		}
+	}
+}
