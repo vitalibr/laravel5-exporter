@@ -10,7 +10,7 @@ This is an exporter to convert [MySQL Workbench](http://www.mysql.com/products/w
 ## Installation
 
 ```
-php composer.phar require --dev mysql-workbench-schema-exporter/laravel5-exporter
+php composer.phar require --dev vitalibr/laravel5-exporter
 ```
 
 This will install the exporter and also require [mysql-workbench-schema-exporter](https://github.com/mysql-workbench-schema-exporter/mysql-workbench-schema-exporter).

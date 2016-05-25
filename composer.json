@@ -1,5 +1,5 @@
 {
-	"name" : "mysql-workbench-schema-exporter/laravel5-exporter",
+	"name" : "vitalibr/laravel5-exporter",
 	"type" : "library",
 	"description" : "MySQL Workbench Schema Exporter for Laravel 5.0",
 	"keywords" : [
