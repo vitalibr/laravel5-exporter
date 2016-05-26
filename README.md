@@ -69,7 +69,7 @@ Additionally to the [common options](https://github.com/mysql-workbench-schema-e
 
     Generate `created_at` and `updated_at` columns to all Tables.
 
-    Default is `Zend_Rest_Controller`.
+    Default is `false`.
 
 ## Command Line Interface (CLI)
 
