@@ -132,7 +132,7 @@ class Table extends BaseTable
         $writer
             ->writeCallback(function(WriterInterface $writer, Table $_this = null) {
                 if (count($_this->getColumns())) {
-                    foreach ($_this->getColumns() as $column) {
+                    foreach ($_this->getColumns() as $column) {   
                         $line = '$table->';
                         $type = $this->getFormatter()->getDatatypeConverter()->getType($column);
 
@@ -149,18 +149,20 @@ class Table extends BaseTable
                          * TODO: 'isUnique' it is not provided by BaseTable and it is necessary to check for size in columns, like decimal(12,5).
                          */
 
-                        $line .= $type . '(\'' . $column->getColumnName() . '\')';
-
+                        $precision = '';
+                        if($column->getLength() != -1) {
+                            $precision = ', ' . $column->getLength();
+                        } else if($column->getParameter('precision') != -1 && $column->getParameter('scale') != -1) {
+                            $precision = ', ' . $column->getParameter('precision') . ', ' . $column->getParameter('scale');
+                        }
+                        $line .= $type . '(\'' . $column->getColumnName() . '\'' . $precision . ')';
                         if (!$column->isNotNull()) {
                             $line .= '->nullable()';
                         }
-
                         if ($column->isUnsigned()) {
                             $line .= '->unsigned()';
                         }
-
                         $line .= ';';
-
                         $writer->write($line);
                     }
                 } 
