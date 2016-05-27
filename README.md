@@ -1,4 +1,5 @@
-# README
+# Laravel 5.0 Exporter
+[![Latest Stable Version](https://poser.pugx.org/vitalibr/laravel5-exporter/v/stable)](https://packagist.org/packages/vitalibr/laravel5-exporter) [![Total Downloads](https://poser.pugx.org/vitalibr/laravel5-exporter/downloads)](https://packagist.org/packages/vitalibr/laravel5-exporter) [![Latest Unstable Version](https://poser.pugx.org/vitalibr/laravel5-exporter/v/unstable)](https://packagist.org/packages/vitalibr/laravel5-exporter) [![License](https://poser.pugx.org/vitalibr/laravel5-exporter/license)](https://packagist.org/packages/vitalibr/laravel5-exporter)
 
 This is an exporter to convert [MySQL Workbench](http://www.mysql.com/products/workbench/) Models (\*.mwb) to Laravel Framework 5 Model and Migration Schema.
 
