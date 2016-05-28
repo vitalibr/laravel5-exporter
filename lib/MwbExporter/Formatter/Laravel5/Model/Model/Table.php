@@ -46,7 +46,7 @@ class Table extends BaseTable
 
     public function writeTable(WriterInterface $writer)
     {
-        if (!$this->isExternal()) {
+        if (!$this->isExternal() && !$this->isManyToMany()) {
             // $this->getModelName() return singular form with correct camel case
             // $this->getRawTableName() return original form with no camel case
             $writer
@@ -78,6 +78,9 @@ class Table extends BaseTable
                             $_this->writeFillable($writer);
                         }
                     })
+                    ->writeCallback(function(WriterInterface $writer, Table $_this = null) {
+                        $_this->writeRelationships($writer);
+                    })
                 ->outdent()
                 ->write('}')
                 ->write('')
@@ -88,6 +91,21 @@ class Table extends BaseTable
         }
 
         return self::WRITE_EXTERNAL;
+    }
+
+    public function writeRelationships(WriterInterface $writer) 
+    {
+        $writer
+            ->writeCallback(function(WriterInterface $writer, Table $_this = null) {
+                if (count($_this->getForeignKeys())) {
+                    foreach ($_this->getForeignKeys() as $foreignKey) {
+                        $foreignKey->write($writer);
+                    }
+                }
+            })
+        ;
+
+        return $this;
     }
 
     public function writeFillable(WriterInterface $writer)

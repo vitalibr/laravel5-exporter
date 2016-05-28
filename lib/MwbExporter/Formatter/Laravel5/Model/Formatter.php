@@ -66,6 +66,15 @@ class Formatter extends BaseFormatter
         return new Model\Table($parent, $node);
     }
 
+    /**
+     * (non-PHPdoc)
+     * @see \MwbExporter\Formatter\Formatter::createForeignKey()
+     */
+    public function createForeignKey(Base $parent, $node)
+    {
+        return new Model\ForeignKey($parent, $node);
+    }
+
     public function getTitle()
     {
         return 'Laravel5 Model';
