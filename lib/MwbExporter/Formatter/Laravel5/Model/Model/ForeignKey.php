@@ -36,7 +36,7 @@ class ForeignKey extends BaseForeignKey
     {
         $writer
             ->write('/**')
-            ->write(' * ')
+            ->write(' * Relationship with ' . $this->getReferencedTable()->getModelName() . '.')
             ->write(' */')   
             ->write('public function ' . $this->getReferencedTable()->getRawTableName() . '()')   
             ->write('{')  
