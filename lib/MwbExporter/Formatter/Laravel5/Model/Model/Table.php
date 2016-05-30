@@ -31,6 +31,7 @@ use MwbExporter\Model\Table as BaseTable;
 use MwbExporter\Formatter\Laravel5\Model\Formatter;
 use MwbExporter\Writer\WriterInterface;
 use MwbExporter\Helper\Comment;
+use Doctrine\Common\Inflector\Inflector;
 
 class Table extends BaseTable
 {
@@ -46,7 +47,7 @@ class Table extends BaseTable
 
     public function writeTable(WriterInterface $writer)
     {
-        if (!$this->isExternal()) {
+        if (!$this->isExternal() && !$this->isManyToMany()) {
             // $this->getModelName() return singular form with correct camel case
             // $this->getRawTableName() return original form with no camel case
             $writer
@@ -78,6 +79,12 @@ class Table extends BaseTable
                             $_this->writeFillable($writer);
                         }
                     })
+                    ->writeCallback(function(WriterInterface $writer, Table $_this = null) {
+                        $_this->writeRelationships($writer);
+                    })
+                    ->writeCallback(function(WriterInterface $writer, Table $_this = null) {
+                        $_this->writeReferences($writer);
+                    })
                 ->outdent()
                 ->write('}')
                 ->write('')
@@ -88,6 +95,65 @@ class Table extends BaseTable
         }
 
         return self::WRITE_EXTERNAL;
+    }
+    
+    public function writeReferences(WriterInterface $writer) 
+    {
+        $writer
+            ->writeCallback(function(WriterInterface $writer, Table $_this = null) {
+                if (count($_this->getColumns())) {
+                    // Get current column from this table
+                    foreach ($_this->getColumns() as $column) {
+                        // Get tables from the same schema
+                        foreach ($this->getParent() as $table) {  
+                            // Get foreignKeys from table
+                            foreach ($table->getForeignKeys() as $foreignKey) {
+                                // If current column is referenced by foreignKey
+                                if(($_this->getRawTableName() == $foreignKey->getReferencedTable()->getRawTableName()) &&
+                                    ($column->getColumnName() == $foreignKey->getForeign()->getColumnName()) &&
+                                    (!$foreignKey->getOwningTable()->isManyToMany())) {
+                                    // Comment                                        
+                                    $writer->write('/**');
+                                    $writer->write(' * Relationship with ' . $foreignKey->getOwningTable()->getModelName() . '.');
+                                    $writer->write(' */'); 
+                                    $writer->write('public function ' . Inflector::pluralize($foreignKey->getOwningTable()->getRawTableName()) . '()');            
+                                    $writer->write('{');       
+                                    $writer->indent();
+                                    // One to Many
+                                    if($foreignKey->isManyToOne()) {
+                                        $writer->write('return $this->hasMany(\'' . $_this->getNamespace() . '\\' . $foreignKey->getOwningTable()->getModelName() . '\');');                      
+                                    } 
+                                    // One to One
+                                    else {
+                                        $writer->write('return $this->hasOne(\'' . $_this->getNamespace() . '\\' . $foreignKey->getOwningTable()->getModelName() . '\');');                                  
+                                    }             
+                                    $writer->outdent();
+                                    $writer->write('}');   
+                                    $writer->write('');      
+                                }
+                            }  
+                        }
+                    }
+                }
+            })
+        ;
+
+        return $this;
+    }
+
+    public function writeRelationships(WriterInterface $writer) 
+    {
+        $writer
+            ->writeCallback(function(WriterInterface $writer, Table $_this = null) {
+                if (count($_this->getForeignKeys())) {
+                    foreach ($_this->getForeignKeys() as $foreignKey) {
+                        $foreignKey->write($writer);
+                    }
+                }
+            })
+        ;
+
+        return $this;
     }
 
     public function writeFillable(WriterInterface $writer)
