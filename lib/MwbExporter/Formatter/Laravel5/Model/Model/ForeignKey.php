@@ -29,6 +29,7 @@ namespace MwbExporter\Formatter\Laravel5\Model\Model;
 
 use MwbExporter\Model\ForeignKey as BaseForeignKey;
 use MwbExporter\Writer\WriterInterface;
+use Doctrine\Common\Inflector\Inflector;
 
 class ForeignKey extends BaseForeignKey
 {
@@ -38,7 +39,7 @@ class ForeignKey extends BaseForeignKey
             ->write('/**')
             ->write(' * Relationship with ' . $this->getReferencedTable()->getModelName() . '.')
             ->write(' */')   
-            ->write('public function ' . $this->getReferencedTable()->getRawTableName() . '()')   
+            ->write('public function ' . Inflector::pluralize($this->getReferencedTable()->getRawTableName()) . '()')   
             ->write('{')  
             ->indent()
                 ->write('return $this->belongsTo(\'' . $this->getReferencedTable()->getNamespace() . '\\' . $this->getReferencedTable()->getModelName() . '\', \'' . $this->getLocal()->getColumnName() . '\');')   

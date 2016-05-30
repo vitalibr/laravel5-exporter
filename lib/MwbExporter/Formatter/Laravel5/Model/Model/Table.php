@@ -31,6 +31,7 @@ use MwbExporter\Model\Table as BaseTable;
 use MwbExporter\Formatter\Laravel5\Model\Formatter;
 use MwbExporter\Writer\WriterInterface;
 use MwbExporter\Helper\Comment;
+use Doctrine\Common\Inflector\Inflector;
 
 class Table extends BaseTable
 {
@@ -115,7 +116,7 @@ class Table extends BaseTable
                                     $writer->write('/**');
                                     $writer->write(' * Relationship with ' . $foreignKey->getOwningTable()->getModelName() . '.');
                                     $writer->write(' */'); 
-                                    $writer->write('public function ' . $foreignKey->getOwningTable()->getRawTableName() . '()');            
+                                    $writer->write('public function ' . Inflector::pluralize($foreignKey->getOwningTable()->getRawTableName()) . '()');            
                                     $writer->write('{');       
                                     $writer->indent();
                                     // One to Many
