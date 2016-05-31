@@ -144,7 +144,7 @@ class Table extends BaseTable
                                     $writer->write('{');       
                                     $writer->indent();   
                                     // Body
-                                    $writer->write('return $this->belongsToMany(\'' . $_this->getNamespace() . '\\' . $foreignKey->getOwningTable()->getModelName() . '\', \'' . $foreignKey->getOwningTable()->getRawTableName() . '\', \'' . $foreignKey->getForeign()->getColumnName() . '\', '');');       
+                                    $writer->write('return $this->belongsToMany(\'' . $_this->getNamespace() . '\\' . $foreignKey->getOwningTable()->getModelName() . '\', \'' . $foreignKey->getOwningTable()->getRawTableName() . '\', \'' . $foreignKey->getForeign()->getColumnName() . '\', \'\');');       
                                     // End Method                                                                     
                                     $writer->outdent();
                                     $writer->write('}');   
