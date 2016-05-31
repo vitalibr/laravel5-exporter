@@ -116,6 +116,7 @@ class Table extends BaseTable
                                     $writer->write('/**');
                                     $writer->write(' * Relationship with ' . $foreignKey->getOwningTable()->getModelName() . '.');
                                     $writer->write(' */'); 
+                                    // Start Method
                                     $writer->write('public function ' . Inflector::pluralize($foreignKey->getOwningTable()->getRawTableName()) . '()');            
                                     $writer->write('{');       
                                     $writer->indent();
@@ -126,10 +127,28 @@ class Table extends BaseTable
                                     // One to One
                                     else {
                                         $writer->write('return $this->hasOne(\'' . $_this->getNamespace() . '\\' . $foreignKey->getOwningTable()->getModelName() . '\');');                                  
-                                    }             
+                                    }                
+                                    // End Method                                                                     
                                     $writer->outdent();
                                     $writer->write('}');   
                                     $writer->write('');      
+                                } else if(($_this->getRawTableName() == $foreignKey->getReferencedTable()->getRawTableName()) &&
+                                            ($column->getColumnName() == $foreignKey->getForeign()->getColumnName()) &&
+                                            ($foreignKey->getOwningTable()->isManyToMany())) {
+                                    // Comment                                        
+                                    $writer->write('/**');
+                                    $writer->write(' * Relationship with ' . $foreignKey->getOwningTable()->getModelName() . '.');
+                                    $writer->write(' */'); 
+                                    // Start Method
+                                    $writer->write('public function ' . Inflector::pluralize($foreignKey->getOwningTable()->getRawTableName()) . '()');            
+                                    $writer->write('{');       
+                                    $writer->indent();   
+                                    // Body
+                                    $writer->write('return $this->belongsToMany(\'' . $_this->getNamespace() . '\\' . $foreignKey->getOwningTable()->getModelName() . '\', \'' . $foreignKey->getOwningTable()->getRawTableName() . '\', \'' . $foreignKey->getForeign()->getColumnName() . '\', '');');       
+                                    // End Method                                                                     
+                                    $writer->outdent();
+                                    $writer->write('}');   
+                                    $writer->write('');                            
                                 }
                             }  
                         }
