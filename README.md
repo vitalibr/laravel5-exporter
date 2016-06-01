@@ -76,13 +76,13 @@ Additionally to the [common options](https://github.com/mysql-workbench-schema-e
 
 See documentation for [mysql-workbench-schema-exporter](https://github.com/mysql-workbench-schema-exporter/mysql-workbench-schema-exporter#command-line-interface-cli)
 
-## Examples (v3.0.2)
+## Examples (v3.0.3)
 
 #### Workbench Schema
 ![alt tag](http://s33.postimg.org/xdhdnf7qn/model.png)
 
 #### Model
-![alt tag](http://s33.postimg.org/kalr45hin/models.png)
+![alt tag](http://s33.postimg.org/j2azui227/migrations.png)
 
 #### Migration
 ![alt tag](http://s33.postimg.org/muhdy952n/migrations.png)
