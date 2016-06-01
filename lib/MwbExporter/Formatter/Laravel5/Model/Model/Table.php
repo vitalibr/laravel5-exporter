@@ -106,51 +106,79 @@ class Table extends BaseTable
                     foreach ($_this->getColumns() as $column) {
                         // Get tables from the same schema
                         foreach ($this->getParent() as $table) {  
-                            // Get foreignKeys from table
-                            foreach ($table->getForeignKeys() as $foreignKey) {
-                                // If current column is referenced by foreignKey
-                                if(($_this->getRawTableName() == $foreignKey->getReferencedTable()->getRawTableName()) &&
-                                    ($column->getColumnName() == $foreignKey->getForeign()->getColumnName()) &&
-                                    (!$foreignKey->getOwningTable()->isManyToMany())) {
-                                    // Comment                                        
-                                    $writer->write('/**');
-                                    $writer->write(' * Relationship with ' . $foreignKey->getOwningTable()->getModelName() . '.');
-                                    $writer->write(' */'); 
-                                    // Start Method
-                                    $writer->write('public function ' . Inflector::pluralize($foreignKey->getOwningTable()->getRawTableName()) . '()');            
-                                    $writer->write('{');       
-                                    $writer->indent();
-                                    // One to Many
-                                    if($foreignKey->isManyToOne()) {
-                                        $writer->write('return $this->hasMany(\'' . $_this->getNamespace() . '\\' . $foreignKey->getOwningTable()->getModelName() . '\');');                      
-                                    } 
-                                    // One to One
-                                    else {
-                                        $writer->write('return $this->hasOne(\'' . $_this->getNamespace() . '\\' . $foreignKey->getOwningTable()->getModelName() . '\');');                                  
-                                    }                
-                                    // End Method                                                                     
-                                    $writer->outdent();
-                                    $writer->write('}');   
-                                    $writer->write('');      
-                                } else if(($_this->getRawTableName() == $foreignKey->getReferencedTable()->getRawTableName()) &&
-                                            ($column->getColumnName() == $foreignKey->getForeign()->getColumnName()) &&
-                                            ($foreignKey->getOwningTable()->isManyToMany())) {
-                                    // Comment                                        
-                                    $writer->write('/**');
-                                    $writer->write(' * Relationship with ' . $foreignKey->getOwningTable()->getModelName() . '.');
-                                    $writer->write(' */'); 
-                                    // Start Method
-                                    $writer->write('public function ' . Inflector::pluralize($foreignKey->getOwningTable()->getRawTableName()) . '()');            
-                                    $writer->write('{');       
-                                    $writer->indent();   
-                                    // Body
-                                    $writer->write('return $this->belongsToMany(\'' . $_this->getNamespace() . '\\' . $foreignKey->getOwningTable()->getModelName() . '\', \'' . $foreignKey->getOwningTable()->getRawTableName() . '\', \'' . $foreignKey->getForeign()->getColumnName() . '\', \'\');');       
-                                    // End Method                                                                     
-                                    $writer->outdent();
-                                    $writer->write('}');   
-                                    $writer->write('');                            
+
+                            // If not a pivot table
+                            if(!$table->isManyToMany()) {
+                                // Get foreignKeys from table
+                                foreach ($table->getForeignKeys() as $foreignKey) {
+                                    // If current column is referenced by foreignKey
+                                    if(($_this->getRawTableName() == $foreignKey->getReferencedTable()->getRawTableName()) &&
+                                        ($column->getColumnName() == $foreignKey->getForeign()->getColumnName())) {
+                                        // Comment                                        
+                                        $writer->write('/**');
+                                        $writer->write(' * Relationship with ' . $foreignKey->getOwningTable()->getModelName() . '.');
+                                        $writer->write(' */'); 
+                                        // Start Method
+                                        $writer->write('public function ' . Inflector::pluralize($foreignKey->getOwningTable()->getRawTableName()) . '()');            
+                                        $writer->write('{');       
+                                        $writer->indent();
+                                        // One to Many
+                                        if($foreignKey->isManyToOne()) {
+                                            $writer->write('return $this->hasMany(\'' . $_this->getNamespace() . '\\' . $foreignKey->getOwningTable()->getModelName() . '\');');                      
+                                        } 
+                                        // One to One
+                                        else {
+                                            $writer->write('return $this->hasOne(\'' . $_this->getNamespace() . '\\' . $foreignKey->getOwningTable()->getModelName() . '\');');                                  
+                                        }                
+                                        // End Method                                                                     
+                                        $writer->outdent();
+                                        $writer->write('}');   
+                                        $writer->write('');      
+                                    }
                                 }
-                            }  
+                            } else {
+                                if(count($table->getForeignKeys()) == 2) {
+                                    // ForeignKey 1
+                                    $foreignKey1 = $table->getForeignKeys()[0];
+                                    // ForeignKey 2
+                                    $foreignKey2 = $table->getForeignKeys()[1];
+
+                                    // If current column is referenced by foreignKey
+                                    if((($_this->getRawTableName() == $foreignKey1->getReferencedTable()->getRawTableName()) ||
+                                        ($_this->getRawTableName() == $foreignKey2->getReferencedTable()->getRawTableName())) &&
+                                        ($column->getColumnName() == $foreignKey1->getForeign()->getColumnName() ||
+                                         $column->getColumnName() == $foreignKey2->getForeign()->getColumnName())) {
+
+                                        // Comment                                        
+                                        $writer->write('/**');
+                                        if($_this->getRawTableName() != $foreignKey1->getReferencedTable()->getRawTableName()) {
+                                            $writer->write(' * Relationship with ' . $foreignKey1->getReferencedTable()->getModelName() . '.');
+                                        } else {
+                                            $writer->write(' * Relationship with ' . $foreignKey2->getReferencedTable()->getModelName() . '.');
+                                        }
+                                        $writer->write(' */'); 
+
+                                        // Method
+                                        if($_this->getRawTableName() != $foreignKey1->getReferencedTable()->getRawTableName()) {
+                                            $writer->write('public function ' . Inflector::pluralize($foreignKey1->getReferencedTable()->getRawTableName()) . '()');     
+                                        } else {
+                                            $writer->write('public function ' . Inflector::pluralize($foreignKey2->getReferencedTable()->getRawTableName()) . '()');     
+                                        }
+     
+                                        $writer->write('{');       
+                                        $writer->indent();   
+                                        // Find out what foreignKey is this reference table and what the other table
+                                        if($_this->getRawTableName() != $foreignKey1->getReferencedTable()->getRawTableName()) {
+                                            $writer->write('return $this->belongsToMany(\'' . $_this->getNamespace() . '\\' . $foreignKey1->getReferencedTable()->getModelName() . '\', \'' . $foreignKey1->getOwningTable()->getRawTableName() . '\', \'' . $foreignKey2->getForeign()->getColumnName() . '\', \'' . $foreignKey1->getForeign()->getColumnName() . '\');');  
+                                        } else {
+                                            $writer->write('return $this->belongsToMany(\'' . $_this->getNamespace() . '\\' . $foreignKey2->getReferencedTable()->getModelName() . '\', \'' . $foreignKey2->getOwningTable()->getRawTableName() . '\', \'' . $foreignKey1->getForeign()->getColumnName() . '\', \'' . $foreignKey2->getForeign()->getColumnName() . '\');');  
+                                        }                                                            
+                                        $writer->outdent();
+                                        $writer->write('}');   
+                                        $writer->write('');
+                                    }
+                                }
+                            }
                         }
                     }
                 }
