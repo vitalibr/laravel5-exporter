@@ -42,7 +42,7 @@ class Table extends BaseTable
 
     public function getTableSuffix()
     {
-        return $this->translateVars($this->getConfig()->get(Formatter::CFG_TABLE_PREFIX));
+        return $this->translateVars($this->getConfig()->get(Formatter::CFG_TABLE_SUFFIX));
     }
 
     public function getParentTable()
